@@ -1,6 +1,7 @@
 import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
+import time
 
 
 class VentilationEnv(gym.Env):
@@ -19,14 +20,13 @@ class VentilationEnv(gym.Env):
         self.T_max = 25
 
         # Episode termination conditions
-        self.max_episode_length = 500
+        self.max_episode_length = 10
         self.delta_T_threshold = 10
 
     def reset(self):
-        # Randomly choose T_outside from an EPW file
-        self.T_outside = np.random.uniform(10, 38)  # Adjust the range based on your EPW data
-        # Set T_inside as T_outside + random(-5, 5)
+        self.T_outside = np.random.uniform(13, 30)
         self.T_inside = self.T_outside + np.random.uniform(-5, 5)
+        self.T_inside_base = self.T_inside
         self.episode_length = 0
         return np.array([self.T_outside, self.T_inside], dtype=np.float32)
 
@@ -43,12 +43,18 @@ class VentilationEnv(gym.Env):
 
         # Temperature constraints
         reward = 0
-        if self.T_min < self.T_inside < self.T_max:
-            reward += 1
-        if abs(self.T_inside - self.T_min) > 5:
-            reward -= 1
-        if abs(self.T_inside - self.T_max) > 5:
-            reward -= 1
+        if abs(self.T_inside - self.T_min)>5 or abs(self.T_inside - self.T_max)>5:
+            reward -=1
+        if self.T_inside < self.T_min:
+            if self.T_inside_base < self.T_inside:
+                reward += 0.2
+            else:
+                reward -= 0.2
+        if self.T_inside > self.T_min:
+            if self.T_inside_base > self.T_inside:
+                reward += 0.2
+            else:
+                reward -= 0.2
 
         # Update episode length
         self.episode_length += 1
@@ -56,6 +62,8 @@ class VentilationEnv(gym.Env):
         # Check termination conditions
         done = (abs(self.T_inside - self.T_outside) > self.delta_T_threshold) or (
                     self.episode_length >= self.max_episode_length)
+
+        time.sleep(0.01)
 
         return np.array([self.T_outside, self.T_inside], dtype=np.float32), reward, done, {}
 
