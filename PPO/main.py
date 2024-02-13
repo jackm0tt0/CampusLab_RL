@@ -1,10 +1,21 @@
-from env import VentilationEnv
+from env import VentilationEnv, SimpleGrasshopperEnv
 import numpy as np
 from agent import Agent
 from utils import plot_learning_curve
+import os
+import tensorflow as tf
 
 if __name__ == '__main__':
-    env = VentilationEnv()
+
+    #GPU check
+    tf.debugging.set_log_device_placement(False) #see if tasks are assigned to GPU or CPU
+    
+    if len(tf.config.list_physical_devices('GPU')):
+        print("\nGPU Found", tf.config.list_physical_devices('GPU')[0], "\n")
+    else:
+        print("\nNO GPU FOUND\n")
+
+    env = SimpleGrasshopperEnv()
     N = 20
     batch_size = 5
     n_epochs = 4
@@ -12,9 +23,16 @@ if __name__ == '__main__':
     agent = Agent(n_actions=2, batch_size=batch_size,
                   alpha=alpha, n_epochs=n_epochs,
                   input_dims=2)
-    n_games = 300
+    n_games = 25
 
-    figure_file = 'plots/cartpole.png'
+    figure_file = r'plots/cartpole.png'
+    #make sure it exists
+    if not os.path.exists("./plots/"):
+        os.mkdir("./plots")
+
+    if not os.path.exists("./post/"):
+        os.mkdir("./post")
+
 
     best_score = env.reward_range[0]
     score_history = []
