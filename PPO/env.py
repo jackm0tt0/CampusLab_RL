@@ -75,12 +75,11 @@ class SimpleGrasshopperEnv(gym.Env):
         # Observation space: [outside temperature, inside temperature]
         self.observation_space = spaces.Box(low=np.array([-50, -50]), high=np.array([50, 50]), dtype=np.float32)
 
-        # set intial internal temperature
-        # keeps temp from last time and adapts
-        self.T_inside = np.random.uniform(10, 38)
+        
 
         # Initial state
-        self.path = 'E:\\ITECH\\23W\\Studio\\CampusLab_RL\\epw\\DEU_BW_Stuttgart-Schnarrenberg.107390_TMYx.epw'
+        self.path = r'../epw/DEU_BW_Stuttgart-Schnarrenberg.107390_TMYx.epw'
+        #self.path = 'E:\\ITECH\\23W\\Studio\\CampusLab_RL\\epw\\DEU_BW_Stuttgart-Schnarrenberg.107390_TMYx.epw'
         self.reset(0)
 
         # Reward rules parameters
@@ -89,15 +88,20 @@ class SimpleGrasshopperEnv(gym.Env):
 
         # Episode termination conditions
         self.max_episode_length = 15
-        self.delta_T_threshold = 10
+        #self.delta_T_threshold = 10
 
     def reset(self, game_round):
         # Read T_outside from an EPW file
         temperature, humidity, wind_direction, wind_speed = get_random_weather_data(self.path , game_round)
         self.T_outside = temperature
 
+        if not "T_inside" in self.__dict__.keys():
+            # set intial internal temperature
+            # keeps temp from last time and adapts
+            self.T_inside = self.T_outside + np.random.uniform(-5, 5)
+
         # Set T_inside as T_outside + random(-5, 5)
-        self.T_inside = self.T_outside + np.random.uniform(-5, 5)
+        #self.T_inside = self.T_outside + np.random.uniform(-5, 5)
         self.episode_length = 0
         return np.array([self.T_outside, self.T_inside], dtype=np.float32)
 
@@ -171,7 +175,8 @@ class SimpleGrasshopperEnv(gym.Env):
         self.episode_length += 1
 
         # Check termination conditions
-        done = (abs(self.T_inside - self.T_outside) > self.delta_T_threshold) or (
+        #done = (abs(self.T_inside - self.T_outside) > self.delta_T_threshold) or 
+        done = (
                     self.episode_length >= self.max_episode_length)
 
         return np.array([self.T_outside, self.T_inside], dtype=np.float32), reward, done, {}

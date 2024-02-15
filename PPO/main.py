@@ -24,7 +24,7 @@ if __name__ == '__main__':
                   alpha=alpha, n_epochs=n_epochs,
                   input_dims=2)
     
-    n_games = 100
+    n_games = 25
 
     figure_file = r'plots/gh_env.png'
     #make sure it exists
