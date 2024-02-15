@@ -2,6 +2,8 @@ import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
 import time
+import os
+
 
 
 class VentilationEnv(gym.Env):
@@ -71,6 +73,10 @@ class SimpleGrasshopperEnv(gym.Env):
         # Observation space: [outside temperature, inside temperature]
         self.observation_space = spaces.Box(low=np.array([-50, -50]), high=np.array([50, 50]), dtype=np.float32)
 
+        # set intial internal temperature
+        # keeps temp from last time and adapts
+        self.T_inside = np.random.uniform(10, 38)
+
         # Initial state
         self.reset()
 
@@ -79,42 +85,80 @@ class SimpleGrasshopperEnv(gym.Env):
         self.T_max = 25
 
         # Episode termination conditions
-        self.max_episode_length = 50
+        self.max_episode_length = 15
         self.delta_T_threshold = 10
 
     def reset(self):
         # Randomly choose T_outside from an EPW file
         self.T_outside = np.random.uniform(10, 38)  # Adjust the range based on your EPW data
         # Set T_inside as T_outside + random(-5, 5)
-        self.T_inside = self.T_outside + np.random.uniform(-5, 5)
+        # self.T_inside = self.T_outside + np.random.uniform(-5, 5)
         self.episode_length = 0
         return np.array([self.T_outside, self.T_inside], dtype=np.float32)
 
     def step(self, action):
 
-        #TEST Talk to gh file
+        request_path = r'post/request.txt' 
+        reply_path = r'post/reply.txt' 
 
-        post_path = r'post/request.txt'    
-        with open(post_path, 'w') as file:
-            txt = ""
-            txt += str(self.T_min)+"\n"
-            txt += str(self.T_max)+"\n"
-            txt += str(self.T_outside)+"\n"
-            txt += str(self.T_inside)+"\n"
-            txt += str(action)+"\n"
-            file.write(txt)
-            file.close()
+        #when was the reply last modified?
+        initial_mtime = os.path.getmtime(reply_path)
 
-        #TODO wait for the gh execution to finish (asyncio??)
-        time.sleep(.5)
+        #create a request to the gh file   
+
+        #make 
+        max_attempts = 3
+        for i in range(max_attempts+1):
+            try:
+                with open(request_path, 'w') as file:
+                    txt = ""
+                    txt += str(self.T_min)+"\n"
+                    txt += str(self.T_max)+"\n"
+                    txt += str(self.T_outside)+"\n"
+                    txt += str(self.T_inside)+"\n"
+                    txt += str(action)+"\n"
+                    file.write(txt)
+                    file.close()              
+                print("Request Sent", end='',flush = True)
+                break
+
+            except (PermissionError, FileNotFoundError) as e:
+                if i == max_attempts:
+                    print("Max attempts reached. Unable to read file.")
+                    raise(e)
+                else:
+                    print(f"{request_path} is unavailable. Attempt {i}: {e}")
+                    time.sleep(.2)  # Wait for a short duration before retrying
         
-        reply_path = r'post/reply.txt'    
+        
+        #wait for the gh script to write a reply
+        max_response_time = 5
+        response_time = 0
+        while response_time <= max_response_time:
+            sleep_time = .1
+            response_time += sleep_time
+            time.sleep(sleep_time)
+            print(".",end='',flush = True)
+            current_mtime = os.path.getmtime(reply_path)
+            if current_mtime != initial_mtime:
+                break
+        if current_mtime == initial_mtime:
+            raise Exception("""
+            Maximimum Response Time Exceeded
+            [1] is the grasshopper file open?
+            [2] is the file path set correctly?
+            [3] is the file set to synchronize?
+            [4] does the simulation require more time? --> change max_response time""")
+           
         with open(reply_path, 'r') as file:
             txt = file.readlines()
-            if len(txt) is not None:
-                self.T_outside = float(txt[0])
-                self.T_outside = float(txt[1])
-                reward = int(txt[2])
+            if len(txt) is not 0:
+                self.T_inside = float(txt[0])
+                reward = float(txt[1])
+                print(f"Reply: Reward = {reward}")
+            else:
+                print("Simulation Failed: Reward = 0")
+                reward = 0
 
             file.close()
 

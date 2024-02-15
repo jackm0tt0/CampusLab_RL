@@ -23,9 +23,10 @@ if __name__ == '__main__':
     agent = Agent(n_actions=2, batch_size=batch_size,
                   alpha=alpha, n_epochs=n_epochs,
                   input_dims=2)
-    n_games = 25
+    
+    n_games = 100
 
-    figure_file = r'plots/cartpole.png'
+    figure_file = r'plots/gh_env.png'
     #make sure it exists
     if not os.path.exists("./plots/"):
         os.mkdir("./plots")
