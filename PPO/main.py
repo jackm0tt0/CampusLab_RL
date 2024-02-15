@@ -43,7 +43,7 @@ if __name__ == '__main__':
     n_steps = 0
 
     for i in range(n_games):
-        observation = env.reset()
+        observation = env.reset(i)
         done = False
         score = 0
         while not done:

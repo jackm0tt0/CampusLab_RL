@@ -3,7 +3,7 @@ from gymnasium import spaces
 import numpy as np
 import time
 import os
-
+from epw import  get_random_weather_data
 
 
 class VentilationEnv(gym.Env):
@@ -25,9 +25,11 @@ class VentilationEnv(gym.Env):
         self.max_episode_length = 50
         self.delta_T_threshold = 10
 
-    def reset(self):
-        # Randomly choose T_outside from an EPW file
-        self.T_outside = np.random.uniform(10, 38)  # Adjust the range based on your EPW data
+    def reset(self,i_path,game_round):
+        # Read T_outside from an EPW file
+        temperature, humidity, wind_direction, wind_speed = get_random_weather_data(i_path, game_round)
+        self.T_outside = temperature
+
         # Set T_inside as T_outside + random(-5, 5)
         self.T_inside = self.T_outside + np.random.uniform(-5, 5)
         self.episode_length = 0
@@ -78,7 +80,8 @@ class SimpleGrasshopperEnv(gym.Env):
         self.T_inside = np.random.uniform(10, 38)
 
         # Initial state
-        self.reset()
+        self.path = 'E:\\ITECH\\23W\\Studio\\CampusLab_RL\\epw\\DEU_BW_Stuttgart-Schnarrenberg.107390_TMYx.epw'
+        self.reset(0)
 
         # Reward rules parameters
         self.T_min = 18
@@ -88,11 +91,13 @@ class SimpleGrasshopperEnv(gym.Env):
         self.max_episode_length = 15
         self.delta_T_threshold = 10
 
-    def reset(self):
-        # Randomly choose T_outside from an EPW file
-        self.T_outside = np.random.uniform(10, 38)  # Adjust the range based on your EPW data
+    def reset(self, game_round):
+        # Read T_outside from an EPW file
+        temperature, humidity, wind_direction, wind_speed = get_random_weather_data(self.path , game_round)
+        self.T_outside = temperature
+
         # Set T_inside as T_outside + random(-5, 5)
-        # self.T_inside = self.T_outside + np.random.uniform(-5, 5)
+        self.T_inside = self.T_outside + np.random.uniform(-5, 5)
         self.episode_length = 0
         return np.array([self.T_outside, self.T_inside], dtype=np.float32)
 
