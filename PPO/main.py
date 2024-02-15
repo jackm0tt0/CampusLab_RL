@@ -14,7 +14,7 @@ if __name__ == '__main__':
     agent = Agent(n_actions=2, batch_size=batch_size,
                   alpha=alpha, n_epochs=n_epochs,
                   input_dims=2)
-    n_games = 10
+    n_games = 100
 
     best_score = env.reward_range[0]
     score_history = []
@@ -39,7 +39,7 @@ if __name__ == '__main__':
                 learn_iters += 1
 
             observation = observation_
-            canvas.update(action,env.T_inside,env.T_outside,n_steps)
+            #canvas.update(action,env.T_inside,env.T_outside,n_steps)
 
         score_history.append(score)
         avg_score = np.mean(score_history[-100:])

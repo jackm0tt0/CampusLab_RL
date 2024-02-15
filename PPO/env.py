@@ -20,11 +20,16 @@ class VentilationEnv(gym.Env):
         self.T_max = 25
 
         # Episode termination conditions
-        self.max_episode_length = 10
+        self.max_episode_length = 50
         self.delta_T_threshold = 10
 
     def reset(self):
-        self.T_outside = np.random.uniform(13, 30)
+        r = np.random.uniform(0,1)
+        if r < 0.5:
+            self.T_outside = np.random.uniform(13, 18)
+        if r >= 0.5:
+            self.T_outside = np.random.uniform(25, 30)
+
         self.T_inside = self.T_outside + np.random.uniform(-5, 5)
         self.T_inside_base = self.T_inside
         self.episode_length = 0
@@ -43,8 +48,8 @@ class VentilationEnv(gym.Env):
 
         # Temperature constraints
         reward = 0
-        if abs(self.T_inside - self.T_min)>5 or abs(self.T_inside - self.T_max)>5:
-            reward -=1
+        #if abs(self.T_inside - self.T_min)>5 or abs(self.T_inside - self.T_max)>5:
+         #   reward -=0.2
         if self.T_inside < self.T_min:
             if self.T_inside_base < self.T_inside:
                 reward += 0.2
