@@ -82,7 +82,8 @@ class SimpleGrasshopperEnv(gym.Env):
         self.T_inside = None
 
         # Initial state
-        self.path = 'E:\\ITECH\\23W\\Studio\\CampusLab_RL\\epw\\DEU_BW_Stuttgart-Schnarrenberg.107390_TMYx.epw'
+        self.path = r'../epw/DEU_BW_Stuttgart-Schnarrenberg.107390_TMYx.epw'
+        #self.path = 'E:\\ITECH\\23W\\Studio\\CampusLab_RL\\epw\\DEU_BW_Stuttgart-Schnarrenberg.107390_TMYx.epw'
         self.reset(0)
 
         # Reward rules parameters

@@ -55,6 +55,7 @@ if __name__ == '__main__':
 
     # TensorBoard callback
     tensorboard_callback = TensorBoard(log_dir=log_dir, histogram_freq=1, update_freq='epoch')
+    tensorboard_callback.set_model(model=agent.actor)
 
     for i in range(n_games):
         observation = env.reset(i)
