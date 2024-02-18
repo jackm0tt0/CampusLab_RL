@@ -1,4 +1,4 @@
-from env import VentilationEnv, SimpleGrasshopperEnv
+from env import VentilationEnv, SimpleGrasshopperEnv, Simulation_GrasshopperEnv
 import numpy as np
 from agent import Agent
 from utils import learning_curve
@@ -18,7 +18,7 @@ if __name__ == '__main__':
         print("\nNO GPU FOUND\n")
 
 
-    env = SimpleGrasshopperEnv()
+    env = Simulation_GrasshopperEnv()
     learning_curve = learning_curve()
     N = 20
     batch_size = 5
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     tensorboard_callback.set_model(model = agent.actor)
 
     for i in range(n_games):
-        observation = env.reset(i)
+        observation = env.reset()
         done = False
         score = 0
         episode_len = 0
@@ -87,7 +87,6 @@ if __name__ == '__main__':
         print('episode', i, 'score %.1f' % score, 'avg score %.1f' % avg_score,
               'time_steps', n_steps, 'learning_steps', learn_iters)
 
-    print(score_history)
     x = [i+1 for i in range(len(score_history))]
     learning_curve.game_score(x, score_history, game_score)
     learning_curve.game_score(x, episode_history, game_episode)
