@@ -28,7 +28,7 @@ if __name__ == '__main__':
                   alpha=alpha, n_epochs=n_epochs,
                   input_dims=2)
     
-    n_games = 500
+    n_games = 5
 
     log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     if not os.path.exists(log_dir):
@@ -89,5 +89,4 @@ if __name__ == '__main__':
 
     print(score_history)
     x = [i+1 for i in range(len(score_history))]
-    learning_curve.game_score(x, score_history, game_score)
-    learning_curve.game_score(x, episode_history, game_episode)
+    learning_curve.game_score(x, score_history)
