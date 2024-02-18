@@ -34,7 +34,6 @@ if __name__ == '__main__':
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
-
     game_score = r'plots/game_score.png'
     game_episode = r'plots/game_episode.png'
     #make sure it exists
@@ -70,8 +69,9 @@ if __name__ == '__main__':
             score += reward
             agent.store_transition(observation, action,
                                    prob, val, reward, done)
+
             if n_steps % N == 0:
-                agent.learn(callbake=tensorboard_callback)
+                agent.learn(callback=tensorboard_callback)
                 learn_iters += 1
             observation = observation_
 

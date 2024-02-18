@@ -51,7 +51,7 @@ class Agent:
 
         return action, log_prob, value
 
-    def learn(self, callbake = None):
+    def learn(self, callback = None):
         for _ in range(self.n_epochs):
             state_arr, action_arr, old_prob_arr, vals_arr,\
                 reward_arr, dones_arr, batches = \
@@ -106,7 +106,13 @@ class Agent:
                         zip(actor_grads, actor_params))
                 self.critic.optimizer.apply_gradients(
                         zip(critic_grads, critic_params))
+            if callback:
+                with tf.summary.create_file_writer(callback.log_dir).as_default():
+                    tf.summary.histogram('actor_loss', actor_loss, step=_)
+                    tf.summary.histogram('critic_loss', critic_loss, step=_)
+                    tf.summary.histogram('reward', reward_arr, step=_)
+                    tf.summary.histogram('critic_value', critic_value, step=_)
 
-            callbake.on_epoch_end(_)
+                callback.on_epoch_end(_)
 
         self.memory.clear_memory()
