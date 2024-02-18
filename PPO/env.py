@@ -76,14 +76,10 @@ class SimpleGrasshopperEnv(gym.Env):
         # Observation space: [outside temperature, inside temperature]
         self.observation_space = spaces.Box(low=np.array([-50, -50]), high=np.array([50, 50]), dtype=np.float32)
 
-        # set intial internal temperature
-        # keeps temp from last time and adapts
-        # self.T_inside = np.random.uniform(10, 38)
-        self.T_inside = None
-
         # Initial state
         self.path = 'E:\\ITECH\\23W\\Studio\\CampusLab_RL\\epw\\DEU_BW_Stuttgart-Schnarrenberg.107390_TMYx.epw'
-        self.reset(0)
+        self.reset()
+        self.T_inside = self.T_outside + np.random.uniform(-5, 5)
 
         # Reward rules parameters
         self.T_min = 18
@@ -93,14 +89,15 @@ class SimpleGrasshopperEnv(gym.Env):
         self.max_episode_length = 5
         self.delta_T_threshold = 10
 
-    def reset(self, game_round):
+    def reset(self):
         # Read T_outside from an EPW file
-        temperature, humidity, wind_direction, wind_speed = get_random_weather_data(self.path , game_round)
+        temperature, humidity, wind_direction, wind_speed = get_random_weather_data(self.path)
         self.T_outside = temperature
 
         # Set T_inside as T_outside + random(-5, 5)
-        if self.T_inside == None:
+        if not hasattr(self, 'T_inside'):
             self.T_inside = self.T_outside + np.random.uniform(-5, 5)
+
         self.episode_length = 0
         return np.array([self.T_outside, self.T_inside], dtype=np.float32)
 

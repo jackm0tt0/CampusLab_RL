@@ -1,8 +1,10 @@
 import pandas as pd
+import numpy as np
 
-def get_random_weather_data(epw_file,row_index):
+def get_random_weather_data(epw_file):
     # Read the EPW file into a pandas DataFrame
     df = pd.read_csv(epw_file, skiprows=8, header=None, sep=',', engine='python')
+    row_index = np.random.randint(0,7000,1,int)
 
     # Extract specific values from the selected row (adjust column indices as needed)
     temperature_outside = df.iloc[row_index, 6]
