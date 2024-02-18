@@ -107,6 +107,6 @@ class Agent:
                 self.critic.optimizer.apply_gradients(
                         zip(critic_grads, critic_params))
 
-                callbake.on_epoch_end(_)
+            callbake.on_epoch_end(_)
 
         self.memory.clear_memory()
