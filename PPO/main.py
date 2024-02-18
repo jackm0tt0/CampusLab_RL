@@ -28,7 +28,7 @@ if __name__ == '__main__':
                   alpha=alpha, n_epochs=n_epochs,
                   input_dims=2)
     
-    n_games = 5
+    n_games = 500
 
     log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     if not os.path.exists(log_dir):
