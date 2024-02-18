@@ -28,13 +28,13 @@ if __name__ == '__main__':
                   alpha=alpha, n_epochs=n_epochs,
                   input_dims=2)
     
-    n_games = 5
+    n_games = 500
 
     log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
 
-    game_score = r'plots/game_score.png'
+    game_score = r'plots/game_score1.png'
     game_episode = r'plots/game_episode.png'
     #make sure it exists
     if not os.path.exists("./plots/"):
@@ -87,6 +87,5 @@ if __name__ == '__main__':
         print('episode', i, 'score %.1f' % score, 'avg score %.1f' % avg_score,
               'time_steps', n_steps, 'learning_steps', learn_iters)
 
-    print(score_history)
     x = [i+1 for i in range(len(score_history))]
-    learning_curve.game_score(x, score_history)
+    learning_curve.game_score(x, score_history,game_score)
